@@ -52,7 +52,7 @@ class Example.Entertainment.SeatDecorator
     end get.
     private set.
 
-    constructor public SeatDecorator(poSeat as ISeat):
+    constructor protected SeatDecorator(poSeat as ISeat):
         oDecoratedSeat = poSeat.
     end constructor.
 
@@ -68,14 +68,24 @@ class Example.Entertainment.SeatDecorator
         oDecoratedSeat:PlayChannel(poChannel, pcId).
     end method.
 
+    /* Returns an adapter for this Seat
+
+       @param P.L.Class The type we want to adapt to
+       @return P.L.Object The adapter. SHOULD be of the type specified by the input argument */
     method public Progress.Lang.Object GetAdapter(pAdaptTo as Progress.Lang.Class):
+        /* Does the current decorator implement or inherit from the requested type? */
         if this-object:GetClass():IsA(pAdaptTo) then
             return this-object.
 
-        if valid-object(oDecoratedSeat)
-        and type-of(oDecoratedSeat, OpenEdge.Core.IAdaptable)
-        then
-            return cast(oDecoratedSeat, OpenEdge.Core.IAdaptable):GetAdapter(pAdaptTo).
+        if valid-object(oDecoratedSeat) then do:
+            /* Does the decorated seat implement or inherit the requested type? */
+            if oDecoratedSeat:GetClass():IsA(pAdaptTo) then
+                return oDecoratedSeat.
+
+            /* Is the decorated seat itself an Adapter? */
+            if type-of(oDecoratedSeat, OpenEdge.Core.IAdaptable) then
+                return cast(oDecoratedSeat, OpenEdge.Core.IAdaptable):GetAdapter(pAdaptTo).
+        end.
 
         return ?.
     end method.

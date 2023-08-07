@@ -1,0 +1,5 @@
+﻿# VSCode folder
+.builder
+
+# ABL r-code
+*.r

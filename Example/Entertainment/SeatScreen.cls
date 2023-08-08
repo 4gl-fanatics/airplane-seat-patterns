@@ -41,6 +41,8 @@ using Example.Entertainment.* from propath.
 class Example.Entertainment.SeatScreen inherits SeatDecorator
     implements ISeatScreen:
 
+    define variable iPipTopLeft as integer no-undo.
+
     define public property Height as integer no-undo
     get.
     private set.
@@ -49,7 +51,7 @@ class Example.Entertainment.SeatScreen inherits SeatDecorator
     get.
     private set.
 
-    define public property Resolution  as ResolutionEnum no-undo
+    define public property Resolution as ResolutionEnum no-undo
     get.
     private set.
 
@@ -66,8 +68,8 @@ class Example.Entertainment.SeatScreen inherits SeatDecorator
                                   poResolution as ResolutionEnum,
                                   plPip as logical,
                                   plTouch as logical,
-                                  poDecoratedSeat as ISeat):
-        super(poDecoratedSeat).
+                                  poSeat as ISeat):
+        super(poSeat).
 
         this-object:Height = piHeight.
         this-object:Width  = piWidth.
@@ -75,15 +77,42 @@ class Example.Entertainment.SeatScreen inherits SeatDecorator
         this-object:SupportsPictureInPicture = plPip.
         this-object:SupportsTouch = plTouch.
 
+        iPipTopLeft = (this-object:Width * 0.85)
+                    + (this-object:Height * 0.85).
+
     end constructor.
 
     method public void PlayPipChannel(poChannel as ChannelTypeEnum, pcId as character):
+
         if not this-object:SupportsPictureInPicture then
             message this-object:GetClass():TypeName + ':PlayPipChannel PiP not supported for this screen'.
-        else if poChannel <> ChannelTypeEnum:Map and poChannel <> ChannelTypeEnum:Tv then
+        else if poChannel <> ChannelTypeEnum:Map and poChannel <> ChannelTypeEnum:Tv then do:
             message this-object:GetClass():TypeName + ':PlayPipChannel PiP not supported for this channel ' + string(poChannel).
-        else
+        end.
+        else do:
             message this-object:GetClass():TypeName + ':PlayPipChannel ' string(poChannel) pcId.
+
+            this-object:PlayContent(iPipTopLeft, this-object:Width + this-object:Height, poChannel, pcId).
+        end.
+
+    end method.
+
+    method override public void PlayChannel(poChannel as ChannelTypeEnum, pcId as character):
+
+        if poChannel <> ChannelTypeEnum:Map and poChannel <> ChannelTypeEnum:Tv then
+            super:PlayChannel(poChannel, pcId).
+        else do:
+            message this-object:GetClass():TypeName + ':PlayChannel ' string(poChannel) pcId.
+
+            this-object:PlayContent(1, this-object:Width + this-object:Height, poChannel, pcId).
+        end.
+    end method.
+
+    method protected void PlayContent (piTopLeft as integer,
+                                       piBottomRight as integer,
+                                       poChannel as ChannelTypeEnum,
+                                       pcId as character):
+        /* get content from server, stream to area etc */
     end method.
 
 end class.

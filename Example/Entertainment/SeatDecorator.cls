@@ -50,7 +50,6 @@ class Example.Entertainment.SeatDecorator
     get():
         return oDecoratedSeat:BluetoothEnabled.
     end get.
-    private set.
 
     constructor protected SeatDecorator(poSeat as ISeat):
         oDecoratedSeat = poSeat.

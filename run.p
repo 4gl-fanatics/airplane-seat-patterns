@@ -50,8 +50,8 @@ oSeat = new SeatControls("C150", oSeat).
 oSeat = new Hd12801024TouchScreen(oSeat).
 
 /* or build individual
-oSeat = new SeatScreen(800, 600, ResolutionEnum:StandardDefinition, false, false, oSeat).
 */
+oSeat = new SeatScreen(800, 600, ResolutionEnum:StandardDefinition, false, false, oSeat).
 
 oSeat:PlayChannel(ChannelTypeEnum:Radio, "WERS").
 
@@ -62,5 +62,6 @@ message 'type-of ISeatScreen? ' type-of(oSeat, ISeatScreen).
 if type-of(oSeat, ISeatScreen) then do:
     message 'Screen details: ' substitute('&1x&2@&3', cast(oSeat, ISeatScreen):Height, cast(oSeat, ISeatScreen):Width, string(cast(oSeat, ISeatScreen):Resolution)).
 
-    cast(oSeat, ISeatScreen):PlayPipChannel(ChannelTypeEnum:Radio, "WBUR").
+    //cast(oSeat, ISeatScreen):PlayPipChannel(ChannelTypeEnum:Radio, "WBUR").
+    cast(oSeat, ISeatScreen):PlayPipChannel(ChannelTypeEnum:Tv, "BBC1").
 end.

@@ -41,25 +41,26 @@ using Example.Entertainment.* from propath.
 class Example.Entertainment.Builder.DefaultSeatBuilder
     inherits SeatBuilder:
 
+    constructor public DefaultSeatBuilder (pcTravelClass as character):
+        super(pcTravelClass).
+    end constructor.
+
     method override protected ISeat GetInstance():
         define variable oSeat as ISeat no-undo.
-        define variable iLoop as integer no-undo.
-
-        /* TODO: types for the various Seat* classes can be parameterised */
 
         oSeat = new Seat( this-object:GetOptionLogicalValue("bluetooth")).
 
         /* Screens? */
-        if this-object:HasOption("screenHeight-1") then
-        do iLoop = 1 to this-object:ScreenCount:
-            /* Use variables to validate the inputs */
-            oSeat = new SeatScreen(integer(this-object:GetOptionNumericValue("screenHeight-" + string(iLoop))),
-                                   integer(this-object:GetOptionNumericValue("screenWidth-" + string(iLoop))),
-                                   cast(this-object:GetOptionObjectValue("screenResolution-" + string(iLoop)), ResolutionEnum),
-                                   this-object:GetOptionLogicalValue("screenPip-" + string(iLoop)),
-                                   this-object:GetOptionLogicalValue("screenTouch-" + string(iLoop)),
+        if this-object:HasOption("screen") then
+            oScreens[iLoop] = cast(this-object:GetOptionObjectValue("screen-" + string(iLoop)), Screen).
+        else
+        if this-object:HasOption("screenHeight") then
+            oSeat = new SeatScreen(integer(this-object:GetOptionNumericValue("screenHeight")),
+                                   integer(this-object:GetOptionNumericValue("screenWidth")),
+                                   cast(this-object:GetOptionObjectValue("screenResolution"), ResolutionEnum),
+                                   this-object:GetOptionLogicalValue("screenPip"),
+                                   this-object:GetOptionLogicalValue("screenTouch"),
                                    oSeat).
-        end.
 
         /* Cast? */
         if this-object:HasOption("cast") then
@@ -73,24 +74,3 @@ class Example.Entertainment.Builder.DefaultSeatBuilder
     end method.
 
 end class.
-
-/*
-Interface ISeat
-    Property BluetoothEnabled as logical
-    method void SelectOutputDevice(DeviceTypeEnum, <parameters>)
-    method void PlayChannel(ChannelTypeEnum, pcId)
-
-Interface ISeatScreen
-    Property Height as integer
-    Property Width as integer
-    Property Resolution  as ResolutionEnum
-    Property SupportsPictureInPicture as logical
-    Property SupportsTouch as logical
-
-Interface ISeatControls
-    Property Controller as ControllerModel
-    Method void InputCommand(<parameters>)
-
-Interface ISeatCast
-method void ConnectHost(<parameters>)
-*/

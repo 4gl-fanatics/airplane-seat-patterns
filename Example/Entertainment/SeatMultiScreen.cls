@@ -25,42 +25,40 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <https://unlicense.org>
 */
 /*------------------------------------------------------------------------
-    File        : run.p
+    File        : SeatMultiScreen
     Purpose     :
-    Syntax      :
+    Syntax      :SeatMultiScreen
     Description :
     Author(s)   : Peter Judge / Consultingwerk. Ltd.
     Created     :
     Notes       :
   ----------------------------------------------------------------------*/
 
-block-level on error undo, throw.
-
 using Example.Entertainment.* from propath.
 
-define variable oSeat as ISeat no-undo.
+class Example.Entertainment.SeatMultiScreen
+    inherits SeatDecorator
+    implements ISeatMultiScreen:
 
-/* Base seat (the one to decorate) */
-oSeat = new Seat(true).
+    define public property Screens as ISeatScreen no-undo extent
+    get.
+    private set.
 
-oSeat = new SeatControls("C150", oSeat).
+    constructor public SeatMultiScreen(poScreens as ISeatScreen extent,
+                                       poSeat as ISeat):
+        super(poSeat).
 
-/* Seat with screen : predefined screen */
-oSeat = new Hd12801024TouchScreen(oSeat).
+        this-object:Screens = poScreens.
+    end constructor.
 
-/* or build individual
-*/
-oSeat = new SeatScreen(800, 600, ResolutionEnum:StandardDefinition, false, false, oSeat).
+    method public void PlayChannel(piScreen as integer, poChannel as ChannelTypeEnum, pcId as character):
+        this-object:Screens[piScreen]:PlayChannel(poChannel, pcId).
+    end method.
 
-oSeat:PlayChannel(ChannelTypeEnum:Radio, "WERS").
+    method public void PlayPipChannel(piScreen as integer,
+                                      poChannel as ChannelTypeEnum,
+                                      pcId as character):
+        this-object:Screens[piScreen]:PlayPipChannel(poChannel, pcId).
+    end method.
 
-message 'TypeName ' oSeat:GetCLass():TypeName.
-message 'type-of ISeat? ' type-of(oSeat, ISeat).
-message 'type-of ISeatScreen? ' type-of(oSeat, ISeatScreen).
-
-if type-of(oSeat, ISeatScreen) then do:
-    message 'Screen details: ' substitute('&1x&2@&3', cast(oSeat, ISeatScreen):Height, cast(oSeat, ISeatScreen):Width, string(cast(oSeat, ISeatScreen):Resolution)).
-
-    //cast(oSeat, ISeatScreen):PlayPipChannel(ChannelTypeEnum:Radio, "WBUR").
-    cast(oSeat, ISeatScreen):PlayPipChannel(ChannelTypeEnum:Tv, "BBC1").
-end.
+end class.

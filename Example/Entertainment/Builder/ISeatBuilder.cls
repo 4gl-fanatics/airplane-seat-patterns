@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <https://unlicense.org>
 */
 /*------------------------------------------------------------------------
-    File        : run.p
+    File        : ISeatBuilder
     Purpose     :
     Syntax      :
     Description :
@@ -33,34 +33,31 @@ For more information, please refer to <https://unlicense.org>
     Created     :
     Notes       :
   ----------------------------------------------------------------------*/
-
 block-level on error undo, throw.
 
+using Example.Entertainment.Builder.* from propath.
 using Example.Entertainment.* from propath.
 
-define variable oSeat as ISeat no-undo.
+interface Example.Entertainment.Builder.ISeatBuilder:
 
-/* Base seat (the one to decorate) */
-oSeat = new Seat(true).
+    define public property Seat as ISeat no-undo
+    get.
 
-oSeat = new SeatControls("C150", oSeat).
+    method public ISeatBuilder EnableBluetooth(plEnable as logical).
 
-/* Seat with screen : predefined screen */
-oSeat = new Hd12801024TouchScreen(oSeat).
+    method public ISeatBuilder ControllerModel(pcController as character).
 
-/* or build individual
-*/
-oSeat = new SeatScreen(800, 600, ResolutionEnum:StandardDefinition, false, false, oSeat).
+    method public ISeatBuilder SupportsCast(plcast as logical).
 
-oSeat:PlayChannel(ChannelTypeEnum:Radio, "WERS").
+    method public ISeatBuilder AddScreen(poScreen as Screen).
 
-message 'TypeName ' oSeat:GetCLass():TypeName.
-message 'type-of ISeat? ' type-of(oSeat, ISeat).
-message 'type-of ISeatScreen? ' type-of(oSeat, ISeatScreen).
+    method public ISeatBuilder AddScreen(piHeight as integer, piWidth as integer).
 
-if type-of(oSeat, ISeatScreen) then do:
-    message 'Screen details: ' substitute('&1x&2@&3', cast(oSeat, ISeatScreen):Height, cast(oSeat, ISeatScreen):Width, string(cast(oSeat, ISeatScreen):Resolution)).
+    method public ISeatBuilder SetScreenResolution(poResolution as ResolutionEnum).
 
-    //cast(oSeat, ISeatScreen):PlayPipChannel(ChannelTypeEnum:Radio, "WBUR").
-    cast(oSeat, ISeatScreen):PlayPipChannel(ChannelTypeEnum:Tv, "BBC1").
-end.
+    method public ISeatBuilder SupportsPictureInPicture(plPip as logical).
+
+    method public ISeatBuilder SupportsTouch(plTouch as logical).
+
+
+end interface.

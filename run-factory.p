@@ -40,7 +40,7 @@ using Example.Entertainment.* from propath.
 
 define variable oA380EconomySeat as ISeat no-undo.
 define variable oA380BusinessSeat as ISeat no-undo.
-define variable oSeatBuilder     as SeatBuilder no-undo.
+define variable oSeatBuilder     as ISeatBuilder no-undo.
 
 oSeatBuilder = SeatBuilder:Build().
 

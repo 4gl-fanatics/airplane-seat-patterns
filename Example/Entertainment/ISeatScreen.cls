@@ -55,4 +55,6 @@ interface Example.Entertainment.ISeatScreen:
 
     method public void PlayPipChannel(poChannel as ChannelTypeEnum, pcId as character).
 
+    method public void PlayChannel(poChannel as ChannelTypeEnum, pcId as character).
+
 end interface.

@@ -1,11 +1,17 @@
 {
-
- "economy-001": {
-    "bluetooth": false,
-    "screen": {
-        "h": 1290,
-        "w": 1025
+    "economy": {
+        "builder": "Example.Entertainment.Builder.DefaultSeatBuilder"
+    },
+    "first": {
+        "builder": "Example.Entertainment.Builder.LuxurySeatBuilder"
+    },
+    "economy-001": {
+        "builder": "Example.Entertainment.Builder.JsonConfigSeatBuilder",
+        "bluetooth": false,
+        "screen": {
+            "h": 1290,
+            "w": 1025,
+            "res": "HighDefinition"
+        }
     }
- }
-
 }

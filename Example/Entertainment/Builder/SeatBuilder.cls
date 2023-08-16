@@ -37,12 +37,19 @@ block-level on error undo, throw.
 
 using Example.Entertainment.Builder.* from propath.
 using Example.Entertainment.* from propath.
+using Progress.Json.ObjectModel.* from propath.
+using Progress.Lang.* from propath.
 
 class Example.Entertainment.Builder.SeatBuilder
     inherits OpenEdge.Core.Util.ConfigBuilder
+    implements ISeatBuilder
     abstract:
 
-    define protected property ScreenCount as integer no-undo
+    define static protected property oConfig as JsonObject no-undo
+    get.
+    private set.
+
+    define protected property TravelClass as character no-undo
     get.
     set.
 
@@ -51,94 +58,85 @@ class Example.Entertainment.Builder.SeatBuilder
         return this-object:GetInstance().
     end get.
 
-    method static public SeatBuilder Build(pcTravelClass as character):
-        case pcTravelClass:
-            when "super-lux" then .
-            when "first" then .
-            when "economy-001" then
-                return (new DefaultSeatBuilder())
-                            :AddScreen(1280, 1024)
-                            :SetScreenResolution(ResolutionEnum:HighDefinition)
-                            :SupportsTouch(yes)
-                            :SupportsPictureInPicture(yes)
-                            :EnableBluetooth(no)
-                            :ControllerModel("C250").
+    constructor static SeatBuilder ():
+        oConfig = cast((new ObjectModelParser()):ParseFile("config.json"), JsonObject).
+    end constructor.
 
-            otherwise
-                return new DefaultSeatBuilder().
-        end case.
+    constructor public SeatBuilder (pcTravelClass as character):
+        this-object:TravelClass = pcTravelClass.
+    end constructor.
+
+    method static public ISeatBuilder Build (pcTravelClass as character):
+        define variable cSeatBuilderType as character no-undo.
+        define variable oSeatBuilder as ISeatBuilder no-undo.
+        define variable oJson as JsonObject no-undo.
+
+        if pcTravelClass > "" and oConfig:Has(pcTravelClass) and oConfig:GetType(pcTravelClass) = JsonDataType:OBJECT then do:
+            oJson = oConfig:GetJsonObject(pcTravelClass).
+            cSeatBuilderType = oJson:GetCharacter("builder").
+        end.
+        else
+            cSeatBuilderType = get-class(DefaultSeatBuilder):TypeName.
+
+        oSeatBuilder = dynamic-new cSeatBuilderType (pcTravelClass).
+
+        return oSeatBuilder.
+
     end method.
 
-    method static public SeatBuilder Build():
+    method static public ISeatBuilder Build ():
         return SeatBuilder:Build("").
     end method.
 
-    method public SeatBuilder EnableBluetooth(plEnable as logical):
+    method public ISeatBuilder EnableBluetooth (plEnable as logical):
         this-object:SetOption("bluetooth", plEnable).
 
         return this-object.
     end method.
 
-    method public SeatBuilder AddScreen(piHeight as integer, piWidth as integer):
-        ScreenCount = ScreenCount + 1.
-
-        this-object:SetOption("screenHeight-" + string(ScreenCount), piHeight).
-        this-object:SetOption("screenWidth-" + string(ScreenCount), piWidth).
+    method public ISeatBuilder AddScreen(poScreen as Screen):
+        this-object:SetOption("screen", poScreen).
 
         return this-object.
     end method.
 
-    method public SeatBuilder SetScreenResolution(poResolution as ResolutionEnum):
-        this-object:SetOption("screenResolution-" + string(ScreenCount), poResolution).
+    method public ISeatBuilder AddScreen (piHeight as integer, piWidth as integer):
+        this-object:SetOption("screenHeight", piHeight).
+        this-object:SetOption("screenWidth", piWidth).
 
         return this-object.
     end method.
 
-    method public SeatBuilder SupportsPictureInPicture(plPip as logical):
-        this-object:SetOption("screenPiP-" + string(ScreenCount), plPip).
+    method public ISeatBuilder SetScreenResolution (poResolution as ResolutionEnum):
+        this-object:SetOption("screenResolution", poResolution).
 
         return this-object.
     end method.
 
-    method public SeatBuilder SupportsTouch(plTouch as logical):
-        this-object:SetOption("screenTouch-" + string(ScreenCount), plTouch).
+    method public ISeatBuilder SupportsPictureInPicture (plPip as logical):
+        this-object:SetOption("screenPiP", plPip).
 
         return this-object.
     end method.
 
-    method public SeatBuilder SupportsCast(plcast as logical):
+    method public ISeatBuilder SupportsTouch (plTouch as logical):
+        this-object:SetOption("screenTouch", plTouch).
+
+        return this-object.
+    end method.
+
+    method public ISeatBuilder SupportsCast (plcast as logical):
         this-object:SetOption("cast", plCast).
 
         return this-object.
     end method.
 
-    method public SeatBuilder ControllerModel(pcController as character):
+    method public ISeatBuilder ControllerModel (pcController as character):
         this-object:SetOption("controller", pcController).
 
         return this-object.
     end method.
 
-    method abstract protected ISeat GetInstance().
+    method abstract protected ISeat GetInstance ().
 
 end class.
-
-/*
-Interface ISeat
-    Property BluetoothEnabled as logical
-    method void SelectOutputDevice(DeviceTypeEnum, <parameters>)
-    method void PlayChannel(ChannelTypeEnum, pcId)
-
-Interface ISeatScreen
-    Property Height as integer
-    Property Width as integer
-    Property Resolution  as ResolutionEnum
-    Property SupportsPictureInPicture as logical
-    Property SupportsTouch as logical
-
-Interface ISeatControls
-    Property Controller as ControllerModel
-    Method void InputCommand(<parameters>)
-
-Interface ISeatCast
-method void ConnectHost(<parameters>)
-*/
